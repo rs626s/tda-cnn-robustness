@@ -1,0 +1,20 @@
+[2025-11-06 06:49:51] Run directory: outputs/resnetTopo_mnist_2025-11-06_06-49-51
+[2025-11-06 06:49:51] Experiment arguments: {'model': 'resnet18_topology', 'dataset': 'mnist', 'epochs': 5, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'resnetTopo_mnist'}
+[2025-11-06 06:49:51] Model parameters: 11,195,085
+[2025-11-06 06:50:18] Epoch 001 | train_loss=0.1377 train_acc=0.9579 | val_loss=0.0816 val_acc=0.9768
+[2025-11-06 06:50:18]   -> Saved best checkpoint (val_acc=0.9768)
+[2025-11-06 06:50:45] Epoch 002 | train_loss=0.0637 train_acc=0.9811 | val_loss=0.0679 val_acc=0.9800
+[2025-11-06 06:50:45]   -> Saved best checkpoint (val_acc=0.9800)
+[2025-11-06 06:51:12] Epoch 003 | train_loss=0.0496 train_acc=0.9856 | val_loss=0.0834 val_acc=0.9763
+[2025-11-06 06:51:39] Epoch 004 | train_loss=0.0437 train_acc=0.9869 | val_loss=0.0530 val_acc=0.9845
+[2025-11-06 06:51:39]   -> Saved best checkpoint (val_acc=0.9845)
+[2025-11-06 06:52:06] Epoch 005 | train_loss=0.0360 train_acc=0.9892 | val_loss=0.0501 val_acc=0.9857
+[2025-11-06 06:52:06]   -> Saved best checkpoint (val_acc=0.9857)
+[2025-11-06 06:52:09] Starting systematic robustness testing...
+[2025-11-06 06:52:20] Robustness noise_sigma_0.0: 0.9901
+[2025-11-06 06:52:20] Robustness noise_sigma_0.1: 0.8241
+[2025-11-06 06:52:20] Robustness noise_sigma_0.2: 0.8179
+[2025-11-06 06:52:20] Robustness noise_sigma_0.3: 0.8012
+[2025-11-06 06:52:21] Running topological feature analysis...
+[2025-11-06 06:52:25] Training complete. Best val_acc=0.9857 | test_acc=0.9901
+[2025-11-06 06:52:25] Robustness Summary: Clean=0.9901, sigma=0.1=0.8241, sigma=0.2=0.8179

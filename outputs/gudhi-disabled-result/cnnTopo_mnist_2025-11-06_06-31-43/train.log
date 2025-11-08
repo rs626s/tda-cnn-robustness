@@ -1,0 +1,2 @@
+[2025-11-06 06:31:43] Run directory: outputs/cnnTopo_mnist_2025-11-06_06-31-43
+[2025-11-06 06:31:43] Experiment arguments: {'model': 'cnn_topology', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'cnnTopo_mnist'}

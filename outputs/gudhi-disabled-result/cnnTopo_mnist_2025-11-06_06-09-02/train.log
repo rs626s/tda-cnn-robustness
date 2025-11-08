@@ -1,0 +1,4 @@
+[2025-11-06 06:09:02] Run directory: outputs/cnnTopo_mnist_2025-11-06_06-09-02
+[2025-11-06 06:09:02] Experiment arguments: {'model': 'cnn_topology', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'cnnTopo_mnist'}
+[2025-11-06 06:09:02] Model parameters: 561,389
+[2025-11-06 06:14:02] Epoch 1 training timed out after 5 minutes

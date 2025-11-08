@@ -1,0 +1,28 @@
+[2025-11-06 06:04:41] Run directory: outputs/cnn_mnist_2025-11-06_06-04-41
+[2025-11-06 06:04:41] Experiment arguments: {'model': 'cnn', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'cnn_mnist'}
+[2025-11-06 06:04:41] Model parameters: 544,522
+[2025-11-06 06:05:01] Epoch 001 | train_loss=0.3557 train_acc=0.8885 | val_loss=0.0896 val_acc=0.9715
+[2025-11-06 06:05:01]   -> Saved best checkpoint (val_acc=0.9715)
+[2025-11-06 06:05:19] Epoch 002 | train_loss=0.1372 train_acc=0.9597 | val_loss=0.0627 val_acc=0.9827
+[2025-11-06 06:05:19]   -> Saved best checkpoint (val_acc=0.9827)
+[2025-11-06 06:05:38] Epoch 003 | train_loss=0.1022 train_acc=0.9696 | val_loss=0.0597 val_acc=0.9842
+[2025-11-06 06:05:38]   -> Saved best checkpoint (val_acc=0.9842)
+[2025-11-06 06:05:57] Epoch 004 | train_loss=0.0880 train_acc=0.9739 | val_loss=0.0579 val_acc=0.9830
+[2025-11-06 06:06:16] Epoch 005 | train_loss=0.0749 train_acc=0.9772 | val_loss=0.0515 val_acc=0.9845
+[2025-11-06 06:06:16]   -> Saved best checkpoint (val_acc=0.9845)
+[2025-11-06 06:06:35] Epoch 006 | train_loss=0.0671 train_acc=0.9801 | val_loss=0.0448 val_acc=0.9873
+[2025-11-06 06:06:35]   -> Saved best checkpoint (val_acc=0.9873)
+[2025-11-06 06:06:53] Epoch 007 | train_loss=0.0583 train_acc=0.9827 | val_loss=0.0414 val_acc=0.9885
+[2025-11-06 06:06:53]   -> Saved best checkpoint (val_acc=0.9885)
+[2025-11-06 06:07:12] Epoch 008 | train_loss=0.0586 train_acc=0.9831 | val_loss=0.0373 val_acc=0.9883
+[2025-11-06 06:07:30] Epoch 009 | train_loss=0.0510 train_acc=0.9840 | val_loss=0.0373 val_acc=0.9897
+[2025-11-06 06:07:30]   -> Saved best checkpoint (val_acc=0.9897)
+[2025-11-06 06:07:50] Epoch 010 | train_loss=0.0487 train_acc=0.9851 | val_loss=0.0330 val_acc=0.9900
+[2025-11-06 06:07:50]   -> Saved best checkpoint (val_acc=0.9900)
+[2025-11-06 06:07:52] Starting systematic robustness testing...
+[2025-11-06 06:08:02] Robustness noise_sigma_0.0: 0.9938
+[2025-11-06 06:08:02] Robustness noise_sigma_0.1: 0.9876
+[2025-11-06 06:08:02] Robustness noise_sigma_0.2: 0.9867
+[2025-11-06 06:08:02] Robustness noise_sigma_0.3: 0.9836
+[2025-11-06 06:08:03] Training complete. Best val_acc=0.9900 | test_acc=0.9938
+[2025-11-06 06:08:03] Robustness Summary: Clean=0.9938, σ=0.1=0.9876, σ=0.2=0.9867

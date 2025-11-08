@@ -1,0 +1,25 @@
+[2025-11-06 06:53:12] Run directory: outputs/vggTopo_mnist_2025-11-06_06-53-12
+[2025-11-06 06:53:12] Experiment arguments: {'model': 'vgg11_topology', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'vggTopo_mnist'}
+[2025-11-06 06:53:12] Model parameters: 128,823,309
+[2025-11-06 06:53:52] Epoch 001 | train_loss=0.6505 train_acc=0.8155 | val_loss=0.1188 val_acc=0.9707
+[2025-11-06 06:54:15]   -> Saved best checkpoint (val_acc=0.9707)
+[2025-11-06 06:54:55] Epoch 002 | train_loss=0.1130 train_acc=0.9729 | val_loss=0.0992 val_acc=0.9748
+[2025-11-06 06:56:04]   -> Saved best checkpoint (val_acc=0.9748)
+[2025-11-06 06:56:45] Epoch 003 | train_loss=0.0872 train_acc=0.9786 | val_loss=0.1129 val_acc=0.9785
+[2025-11-06 06:57:32]   -> Saved best checkpoint (val_acc=0.9785)
+[2025-11-06 06:58:12] Epoch 004 | train_loss=0.0889 train_acc=0.9806 | val_loss=0.1065 val_acc=0.9758
+[2025-11-06 06:58:52] Epoch 005 | train_loss=0.0721 train_acc=0.9838 | val_loss=0.0555 val_acc=0.9897
+[2025-11-06 07:00:17]   -> Saved best checkpoint (val_acc=0.9897)
+[2025-11-06 07:00:58] Epoch 006 | train_loss=0.0631 train_acc=0.9859 | val_loss=0.0726 val_acc=0.9845
+[2025-11-06 07:01:38] Epoch 007 | train_loss=0.0600 train_acc=0.9869 | val_loss=0.0696 val_acc=0.9828
+[2025-11-06 07:02:17] Epoch 008 | train_loss=0.0608 train_acc=0.9872 | val_loss=0.0869 val_acc=0.9833
+[2025-11-06 07:02:57] Epoch 009 | train_loss=0.0646 train_acc=0.9867 | val_loss=0.0912 val_acc=0.9793
+[2025-11-06 07:03:37] Epoch 010 | train_loss=0.0575 train_acc=0.9874 | val_loss=0.0618 val_acc=0.9873
+[2025-11-06 07:03:42] Starting systematic robustness testing...
+[2025-11-06 07:03:54] Robustness noise_sigma_0.0: 0.9934
+[2025-11-06 07:03:54] Robustness noise_sigma_0.1: 0.9731
+[2025-11-06 07:03:54] Robustness noise_sigma_0.2: 0.9713
+[2025-11-06 07:03:54] Robustness noise_sigma_0.3: 0.9584
+[2025-11-06 07:03:54] Running topological feature analysis...
+[2025-11-06 07:03:57] Training complete. Best val_acc=0.9897 | test_acc=0.9934
+[2025-11-06 07:03:57] Robustness Summary: Clean=0.9934, sigma=0.1=0.9731, sigma=0.2=0.9713

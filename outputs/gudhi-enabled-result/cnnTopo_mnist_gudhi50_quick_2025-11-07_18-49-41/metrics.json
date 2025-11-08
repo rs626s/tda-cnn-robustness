@@ -1,0 +1,11 @@
+{
+  "best_val_acc": 0.20000000298023224,
+  "test_acc": 0.1875,
+  "params": 561389,
+  "model": "cnn_topology",
+  "dataset": "mnist",
+  "epochs": 2,
+  "eval_noise": "none",
+  "noise_sigma": 0.0,
+  "noise_sigma_0.1": 0.1625
+}

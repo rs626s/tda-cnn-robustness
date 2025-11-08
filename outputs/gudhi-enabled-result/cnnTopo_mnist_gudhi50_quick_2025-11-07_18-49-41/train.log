@@ -1,0 +1,11 @@
+[2025-11-07 18:49:41] Run directory: outputs\cnnTopo_mnist_gudhi150_quick_2025-11-07_18-49-41
+[2025-11-07 18:49:41] Experiment arguments: {'model': 'cnn_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 50, 'epochs': 2, 'batchSize': 16, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.1], 'robustnessMaxBatches': 5, 'outDir': 'outputs', 'tag': 'cnnTopo_mnist_gudhi150_quick'}
+[2025-11-07 18:49:41] Model parameters: 561,389
+[2025-11-07 18:52:39] Epoch 001 | train_loss=2.3861 train_acc=0.1333 | val_loss=2.3736 val_acc=0.0000
+[2025-11-07 18:54:33] Epoch 002 | train_loss=2.2395 train_acc=0.2667 | val_loss=2.2978 val_acc=0.2000
+[2025-11-07 18:54:33]   -> Saved best checkpoint (val_acc=0.2000)
+[2025-11-07 18:56:57] Starting systematic robustness testing...
+[2025-11-07 19:00:19] Robustness noise_sigma_0.1: 0.1625
+[2025-11-07 19:00:20] Running topological feature analysis...
+[2025-11-07 19:04:13] Training complete. Best val_acc=0.2000 | test_acc=0.1875
+[2025-11-07 19:04:13] Robustness Summary: Clean=0.1875, sigma=0.1=0.1625, sigma=0.2=0.0000

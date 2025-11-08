@@ -1,0 +1,7 @@
+[2025-11-06 12:14:56] Run directory: outputs\resnet18Topo_mnist_gudhi_2025-11-06_12-14-56
+[2025-11-06 12:14:56] Experiment arguments: {'model': 'resnet18_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 3000, 'epochs': 2, 'batchSize': 32, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': False, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'resnet18Topo_mnist_gudhi'}
+[2025-11-06 12:14:56] Model parameters: 11,195,085
+[2025-11-06 15:09:27] Epoch 001 | train_loss=0.5733 train_acc=0.8159 | val_loss=0.2437 val_acc=0.9100
+[2025-11-06 15:09:28]   -> Saved best checkpoint (val_acc=0.9100)
+[2025-11-06 16:23:11] Epoch 002 | train_loss=0.2485 train_acc=0.9230 | val_loss=0.1941 val_acc=0.9533
+[2025-11-06 16:23:11]   -> Saved best checkpoint (val_acc=0.9533)

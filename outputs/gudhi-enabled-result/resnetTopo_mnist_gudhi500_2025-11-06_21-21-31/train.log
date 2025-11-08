@@ -1,0 +1,5 @@
+[2025-11-06 21:21:31] Run directory: outputs\resnetTopo_mnist_gudhi500_2025-11-06_21-21-31
+[2025-11-06 21:21:31] Experiment arguments: {'model': 'resnet18_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 100, 'epochs': 1, 'batchSize': 32, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'resnetTopo_mnist_gudhi500'}
+[2025-11-06 21:21:31] Model parameters: 11,195,085
+[2025-11-06 21:27:15] Epoch 001 | train_loss=1.8115 train_acc=0.4000 | val_loss=2.3428 val_acc=0.0000
+[2025-11-06 21:27:15] No best checkpoint found at outputs\resnetTopo_mnist_gudhi500_2025-11-06_21-21-31\model_best.pt. Training may have stopped early; using last model weights instead.

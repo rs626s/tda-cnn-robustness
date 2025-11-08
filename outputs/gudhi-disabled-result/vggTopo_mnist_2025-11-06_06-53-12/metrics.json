@@ -1,0 +1,14 @@
+{
+  "best_val_acc": 0.9896666679382324,
+  "test_acc": 0.9934,
+  "params": 128888909,
+  "model": "vgg11_topology",
+  "dataset": "mnist",
+  "epochs": 10,
+  "eval_noise": "none",
+  "noise_sigma": 0.0,
+  "noise_sigma_0.0": 0.9934,
+  "noise_sigma_0.1": 0.9731,
+  "noise_sigma_0.2": 0.9713,
+  "noise_sigma_0.3": 0.9584
+}

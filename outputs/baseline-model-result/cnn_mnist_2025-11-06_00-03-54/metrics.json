@@ -1,0 +1,14 @@
+{
+  "best_val_acc": 0.9896666666666667,
+  "test_acc": 0.9935,
+  "params": 544522,
+  "model": "cnn",
+  "dataset": "mnist",
+  "epochs": 10,
+  "eval_noise": "none",
+  "noise_sigma": 0.0,
+  "noise_sigma_0.0": 0.9935,
+  "noise_sigma_0.1": 0.9862,
+  "noise_sigma_0.2": 0.9856,
+  "noise_sigma_0.3": 0.9824
+}

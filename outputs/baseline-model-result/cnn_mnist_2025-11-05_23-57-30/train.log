@@ -1,0 +1,4 @@
+[2025-11-05 23:57:30] Run directory: outputs\cnn_mnist_2025-11-05_23-57-30
+[2025-11-05 23:57:30] Experiment arguments: {'model': 'cnn', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'cnn_mnist'}
+[2025-11-05 23:57:30] Model parameters: 421,642
+[2025-11-05 23:57:45] Error in epoch 1: mat1 and mat2 shapes cannot be multiplied (128x4096 and 3136x128)

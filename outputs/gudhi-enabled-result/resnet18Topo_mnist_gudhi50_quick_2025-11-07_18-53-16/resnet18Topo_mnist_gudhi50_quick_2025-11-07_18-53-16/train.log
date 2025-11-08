@@ -1,0 +1,11 @@
+[2025-11-07 18:53:16] Run directory: outputs\resnet18Topo_mnist_gudhi50_quick_2025-11-07_18-53-16
+[2025-11-07 18:53:16] Experiment arguments: {'model': 'resnet18_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 50, 'epochs': 2, 'batchSize': 16, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.1], 'robustnessMaxBatches': 5, 'outDir': 'outputs', 'tag': 'resnet18Topo_mnist_gudhi50_quick'}
+[2025-11-07 18:53:16] Model parameters: 11,195,085
+[2025-11-07 18:54:20] Epoch 001 | train_loss=2.4747 train_acc=0.2000 | val_loss=2.4054 val_acc=0.2000
+[2025-11-07 18:54:21]   -> Saved best checkpoint (val_acc=0.2000)
+[2025-11-07 18:55:21] Epoch 002 | train_loss=0.7885 train_acc=0.7556 | val_loss=2.4338 val_acc=0.2000
+[2025-11-07 18:56:52] Starting systematic robustness testing...
+[2025-11-07 18:58:55] Robustness noise_sigma_0.1: 0.1000
+[2025-11-07 18:58:55] Running topological feature analysis...
+[2025-11-07 19:00:20] Training complete. Best val_acc=0.2000 | test_acc=0.1125
+[2025-11-07 19:00:20] Robustness Summary: Clean=0.1125, sigma=0.1=0.1000, sigma=0.2=0.0000

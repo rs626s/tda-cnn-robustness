@@ -1,0 +1,27 @@
+[2025-11-06 00:18:14] Run directory: outputs\resnet18_mnist_2025-11-06_00-18-14
+[2025-11-06 00:18:14] Experiment arguments: {'model': 'resnet18', 'dataset': 'mnist', 'epochs': 10, 'batchSize': 128, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'resnet18_mnist'}
+[2025-11-06 00:18:14] Model parameters: 11,175,370
+[2025-11-06 00:21:31] Epoch 001 | train_loss=0.1335 train_acc=0.9593 | val_loss=0.0830 val_acc=0.9745
+[2025-11-06 00:21:31]   -> Saved best checkpoint (val_acc=0.9745)
+[2025-11-06 00:25:07] Epoch 002 | train_loss=0.0639 train_acc=0.9809 | val_loss=0.0741 val_acc=0.9783
+[2025-11-06 00:25:07]   -> Saved best checkpoint (val_acc=0.9783)
+[2025-11-06 00:28:55] Epoch 003 | train_loss=0.0485 train_acc=0.9850 | val_loss=0.0564 val_acc=0.9837
+[2025-11-06 00:28:55]   -> Saved best checkpoint (val_acc=0.9837)
+[2025-11-06 00:32:42] Epoch 004 | train_loss=0.0408 train_acc=0.9873 | val_loss=0.0536 val_acc=0.9847
+[2025-11-06 00:32:42]   -> Saved best checkpoint (val_acc=0.9847)
+[2025-11-06 00:35:55] Epoch 005 | train_loss=0.0368 train_acc=0.9887 | val_loss=0.0453 val_acc=0.9877
+[2025-11-06 00:35:56]   -> Saved best checkpoint (val_acc=0.9877)
+[2025-11-06 00:39:31] Epoch 006 | train_loss=0.0342 train_acc=0.9896 | val_loss=0.0492 val_acc=0.9855
+[2025-11-06 00:43:11] Epoch 007 | train_loss=0.0310 train_acc=0.9905 | val_loss=0.0363 val_acc=0.9895
+[2025-11-06 00:43:11]   -> Saved best checkpoint (val_acc=0.9895)
+[2025-11-06 00:47:22] Epoch 008 | train_loss=0.0283 train_acc=0.9915 | val_loss=0.0365 val_acc=0.9908
+[2025-11-06 00:47:22]   -> Saved best checkpoint (val_acc=0.9908)
+[2025-11-06 00:52:21] Epoch 009 | train_loss=0.0258 train_acc=0.9924 | val_loss=0.0483 val_acc=0.9867
+[2025-11-06 00:57:21] Epoch 10 training timed out after 5 minutes
+[2025-11-06 00:57:55] Starting systematic robustness testing...
+[2025-11-06 01:00:05] Robustness noise_sigma_0.0: 0.9933
+[2025-11-06 01:00:05] Robustness noise_sigma_0.1: 0.4769
+[2025-11-06 01:00:05] Robustness noise_sigma_0.2: 0.4690
+[2025-11-06 01:00:05] Robustness noise_sigma_0.3: 0.4375
+[2025-11-06 01:00:09] Training complete. Best val_acc=0.9908 | test_acc=0.9933
+[2025-11-06 01:00:09] Robustness Summary: Clean=0.9933, σ=0.1=0.4769, σ=0.2=0.4690

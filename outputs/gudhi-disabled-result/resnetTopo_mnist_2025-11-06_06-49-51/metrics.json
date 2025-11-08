@@ -1,0 +1,14 @@
+{
+  "best_val_acc": 0.9856666679382324,
+  "test_acc": 0.9901,
+  "params": 11260685,
+  "model": "resnet18_topology",
+  "dataset": "mnist",
+  "epochs": 5,
+  "eval_noise": "none",
+  "noise_sigma": 0.0,
+  "noise_sigma_0.0": 0.9901,
+  "noise_sigma_0.1": 0.8241,
+  "noise_sigma_0.2": 0.8179,
+  "noise_sigma_0.3": 0.8012
+}

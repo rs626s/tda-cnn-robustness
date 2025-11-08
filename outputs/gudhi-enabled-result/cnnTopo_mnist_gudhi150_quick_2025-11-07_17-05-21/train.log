@@ -1,0 +1,6 @@
+[2025-11-07 17:05:21] Run directory: outputs\cnnTopo_mnist_gudhi150_quick_2025-11-07_17-05-21
+[2025-11-07 17:05:21] Experiment arguments: {'model': 'cnn_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 150, 'epochs': 2, 'batchSize': 32, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.1], 'robustnessMaxBatches': 20, 'outDir': 'outputs', 'tag': 'cnnTopo_mnist_gudhi150_quick'}
+[2025-11-07 17:05:21] Model parameters: 561,389
+[2025-11-07 17:09:04] Epoch 001 | train_loss=2.2629 train_acc=0.1778 | val_loss=2.2342 val_acc=0.2000
+[2025-11-07 17:09:04]   -> Saved best checkpoint (val_acc=0.2000)
+[2025-11-07 17:12:34] Epoch 002 | train_loss=2.0391 train_acc=0.2815 | val_loss=2.1520 val_acc=0.2000

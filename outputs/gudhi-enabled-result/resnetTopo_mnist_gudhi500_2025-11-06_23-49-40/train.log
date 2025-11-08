@@ -1,0 +1,7 @@
+[2025-11-06 23:49:40] Run directory: outputs\resnetTopo_mnist_gudhi500_2025-11-06_23-49-40
+[2025-11-06 23:49:40] Experiment arguments: {'model': 'resnet18_topology', 'dataset': 'mnist', 'useGudhi': True, 'subsetSize': 100, 'epochs': 2, 'batchSize': 32, 'lr': 0.001, 'weightDecay': 0.0001, 'valSplit': 0.1, 'seed': 42, 'evalNoise': 'none', 'noiseSigma': 0.0, 'testRobustness': True, 'robustnessLevels': [0.0, 0.1, 0.2, 0.3], 'outDir': 'outputs', 'tag': 'resnetTopo_mnist_gudhi500'}
+[2025-11-06 23:49:40] Model parameters: 11,195,085
+[2025-11-06 23:52:01] Epoch 001 | train_loss=1.7651 train_acc=0.3556 | val_loss=2.4069 val_acc=0.2000
+[2025-11-06 23:52:01]   -> Saved best checkpoint (val_acc=0.2000)
+[2025-11-06 23:54:24] Epoch 002 | train_loss=0.5468 train_acc=0.8556 | val_loss=2.5262 val_acc=0.1000
+[2025-11-07 11:15:01] Starting systematic robustness testing...
