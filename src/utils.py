@@ -1,16 +1,19 @@
-import os
-import torch
-from datetime import datetime
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
-import itertools
 from torch.nn.parameter import UninitializedParameter
+from sklearn.metrics import confusion_matrix
+from datetime import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+import itertools
+import torch
+import os
 
 
-# ===== Original utils functions =====
+# -------------------------------------------------------------------------
+# Save model checkpoint with training state.
+# Inputs: model, optimizer, epoch (int), path (save location)
+# Output: checkpoint file (.pt) containing model and optimizer states
+# -------------------------------------------------------------------------
 def saveCheckpoint(model, optimizer, epoch, path):
-    """Saves model checkpoint"""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     state = {
         "epoch": epoch,
@@ -19,8 +22,13 @@ def saveCheckpoint(model, optimizer, epoch, path):
     }
     torch.save(state, path)
 
+
+# -------------------------------------------------------------------------
+# Load model and optimizer state from a checkpoint file.
+# Inputs: model, optimizer, path (checkpoint file), device (CPU/GPU)
+# Output: last saved epoch number (int)
+# -------------------------------------------------------------------------
 def loadCheckpoint(model, optimizer, path, device):
-    """Loads model checkpoint"""
     if not os.path.isfile(path):
         raise FileNotFoundError(f"Checkpoint '{path}' not found.")
     checkpoint = torch.load(path, map_location=device)
@@ -28,44 +36,62 @@ def loadCheckpoint(model, optimizer, path, device):
     optimizer.load_state_dict(checkpoint["optimizer_state"])
     return checkpoint.get("epoch", 0)
 
+
+# -------------------------------------------------------------------------
+# Log a message with a timestamp to console and file.
+# Inputs: message (str), logFile (optional, default='train.log')
+# Output: writes formatted log entry with timestamp to file and prints to console
+# -------------------------------------------------------------------------
 def logMessage(message, logFile="train.log"):
-    """Logs message with timestamp"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    fullMessage = f"[{timestamp}] {message}"
-    
+    fullMessage = f"[{timestamp}] {message}"    
     print(fullMessage)
-    
-    # Use UTF-8 encoding to handle Unicode characters properly
+
     try:
         with open(logFile, "a", encoding="utf-8") as f:
             f.write(fullMessage + "\n")
     except UnicodeEncodeError:
-        # Fallback: replace problematic Unicode characters
         safe_message = fullMessage.encode('utf-8', errors='replace').decode('utf-8')
         with open(logFile, "a", encoding="utf-8") as f:
             f.write(safe_message + "\n")
 
 
-# ===== Metrics functions (moved from metrics.py) =====
+
+# -------------------------------------------------------------------------
+# Count the total number of trainable parameters in a model.
+# Inputs: model (torch.nn.Module)
+# Output: integer count of all initialized trainable parameters
+# -------------------------------------------------------------------------
 def countParameters(model: torch.nn.Module) -> int:
-    """Counts trainable parameters in a model, skipping uninitialized lazy params"""
     total = 0
     for p in model.parameters():
         if not p.requires_grad:
             continue
-        # Skip lazy / uninitialized parameters (e.g., from nn.LazyLinear)
         if isinstance(p, UninitializedParameter):
             continue
         total += p.numel()
     return total
 
+
+
+# -------------------------------------------------------------------------
+# Compute top-1 classification accuracy from model logits.
+# Inputs: logits (predicted outputs), targets (true labels)
+# Output: accuracy value as a float
+# -------------------------------------------------------------------------
 def accuracyFromLogits(logits: torch.Tensor, targets: torch.Tensor) -> float:
-    """Computes top-1 accuracy from raw logits"""
     preds = torch.argmax(logits, dim=1)
     return (preds == targets).float().mean().item()
 
+
+
+# -------------------------------------------------------------------------
+# Generate and save a confusion matrix visualization as a PNG image.
+# Inputs: yTrue (true labels), yPred (predicted labels),
+#         classes (list of class names), path (save location)
+# Output: saved image file 'confusion_matrix.png'
+# -------------------------------------------------------------------------
 def saveConfusionMatrix(yTrue, yPred, classes, path):
-    """Saves confusion matrix as PNG"""
     cm = confusion_matrix(yTrue, yPred)
     fig = plt.figure(figsize=(6, 5))
     plt.imshow(cm, interpolation='nearest')
@@ -90,8 +116,14 @@ def saveConfusionMatrix(yTrue, yPred, classes, path):
     fig.savefig(path, bbox_inches='tight')
     plt.close(fig)
 
+
+
+# -------------------------------------------------------------------------
+# Plot and save training vs validation accuracy curves across epochs.
+# Inputs: history (dict with 'train_acc' and 'val_acc'), outPath (save location)
+# Output: saved plot image 'learning_curves.png'
+# -------------------------------------------------------------------------
 def plotLearningCurves(history, outPath):
-    """Plots training and validation accuracy curves"""
     trainAcc = history.get("train_acc", [])
     valAcc = history.get("val_acc", [])
     

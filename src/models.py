@@ -1,10 +1,15 @@
-import torch
-import torch.nn as nn
-import torchvision.models as models
-import gudhi
 from pllay import PersistenceLandscapeLayer
+import torchvision.models as models
+import torch.nn as nn
+import torch
+import gudhi
 
-# ===== Model Building Function =====
+
+# -------------------------------------------------------------------------
+# Build and return the specified neural network architecture.
+# Inputs: modelName, inCh, imgSize, numClasses, useGudhi (bool for topology)
+# Output: initialized model instance
+# -------------------------------------------------------------------------
 def buildModel(modelName, inCh, imgSize, numClasses, useGudhi: bool = False):
     modelName = modelName.lower()
     
@@ -23,22 +28,26 @@ def buildModel(modelName, inCh, imgSize, numClasses, useGudhi: bool = False):
     
     raise ValueError(f"Unknown model '{modelName}'")
 
-# ===== Models with Topological Pre-processing =====
+
+
+# -------------------------------------------------------------------------
+# Neural module for extracting and transforming topological features using PLLay.
+# Inputs: outputDim (feature size), useGudhi (bool), maxPoints (for Gudhi)
+# Output: tensor of topological feature vectors (B * outputDim)
+# -------------------------------------------------------------------------
 class TopologicalPreprocess(nn.Module):
     def __init__(self, outputDim=64, useGudhi: bool = False, maxPoints: int = 256):
         super().__init__()
         self.outputDim = outputDim
 
-        # Use PLLay; it will internally decide whether to use Gudhi or fallback
         self.plLayer = PersistenceLandscapeLayer(
             filtrationType="dtm",
             m0=0.05,
             kMax=3,
             resolution=outputDim,
-            useGudhi=useGudhi,   # fast learned descriptor
-            maxPoints=maxPoints,    # safe default even if you later enable Gudhi
+            useGudhi=useGudhi,                                                  #fast learned descriptor
+            maxPoints=maxPoints,
         )
-
 
         self.featureTransform = nn.Sequential(
             nn.Linear(outputDim, 128),
@@ -47,12 +56,10 @@ class TopologicalPreprocess(nn.Module):
         )
 
     def forward(self, x):
-        # x: (B, C, H, W) on some device (cpu or cuda)
         try:
-            topologicalRaw = self.plLayer(x)      # (B, outputDim)
+            topologicalRaw = self.plLayer(x)                                        #(B, outputDim)
             topologicalFeatures = self.featureTransform(topologicalRaw)
         except Exception as e:
-            # Safety: if anything in topology fails, return zeros on correct device
             batchSize = x.shape[0]
             print(f"Topology computation failed, using zeros: {e}")
             topologicalFeatures = torch.zeros(batchSize, self.outputDim, device=x.device)
@@ -60,15 +67,18 @@ class TopologicalPreprocess(nn.Module):
         return topologicalFeatures
     
 
+# -------------------------------------------------------------------------
+# CNN model augmented with a topological preprocessing channel (PLLay-based).
+# Inputs: inCh, numClasses, imgSize, topologyDim, useGudhi (bool), maxPoints
+# Output: class logits from CNN with integrated topological features
+# -------------------------------------------------------------------------
 class CnnWithTopologyPreprocess(nn.Module):
     def __init__(self, inCh, numClasses, imgSize, topologyDim=64, useGudhi: bool = False, maxPoints: int = 256):
         super().__init__()
         self.imgSize = imgSize
         self.topologyLayer = TopologicalPreprocess(outputDim=topologyDim, useGudhi=useGudhi, maxPoints=maxPoints)
-
-        # CNN will see original image + 1 topology channel
-        self.cnnInputChannels = inCh + 1
-
+        
+        self.cnnInputChannels = inCh + 1                                        #CNN will see original image + 1 topology channel
         self.cnn = nn.Sequential(
             nn.Conv2d(self.cnnInputChannels, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
@@ -79,9 +89,7 @@ class CnnWithTopologyPreprocess(nn.Module):
             nn.Flatten(),
         )
 
-        # Calculate CNN output dimension dynamically
         self.cnnOutputDim = self.getCnnOutputDim()
-
         self.classifier = nn.Sequential(
             nn.Linear(self.cnnOutputDim, 128),
             nn.ReLU(inplace=True),
@@ -101,46 +109,41 @@ class CnnWithTopologyPreprocess(nn.Module):
             return dummyOutput.shape[1]
 
     def buildTopologyChannel(self, x):
-        # x: (batch, inCh, H, W)
-        topologyFeatures = self.topologyLayer(x)  # (batch, topologyDim)
+        topologyFeatures = self.topologyLayer(x)                                            #(batch, topologyDim)
         batchSize, _, h, w = x.shape
 
         firstFeature = topologyFeatures[:, 0].view(batchSize, 1, 1, 1)
-        topologyChannel = firstFeature.expand(-1, 1, h, w)  # (batch, 1, H, W)
+        topologyChannel = firstFeature.expand(-1, 1, h, w)                                  #(batch, 1, H, W)
         return topologyChannel
 
-    def forward(self, x):
-        # 1) Pre-processing: persistence on the raw image
-        topologyChannel = self.buildTopologyChannel(x)
-
-        # 2) Concatenate persistence as extra input channel (pre-CNN)
-        cnnInput = torch.cat([x, topologyChannel], dim=1)
-
-        # 3) Standard CNN pipeline
-        cnnFeatures = self.cnn(cnnInput)
+    def forward(self, x):        
+        topologyChannel = self.buildTopologyChannel(x)                                      #Step1: Pre-processing: persistence on the raw image        
+        cnnInput = torch.cat([x, topologyChannel], dim=1)                                   #Step2: Concatenate persistence as extra input channel (pre-CNN)        
+        cnnFeatures = self.cnn(cnnInput)                                                    #Step3: Standard CNN pipeline
         logits = self.classifier(cnnFeatures)
         return logits
 
 
+
+# -------------------------------------------------------------------------
+# ResNet model extended with a topological preprocessing channel (PLLay-based).
+# Inputs: modelName, numClasses, inCh, imgSize, topologyDim, useGudhi, maxPoints
+# Output: class logits from ResNet with integrated topological features
+# -------------------------------------------------------------------------
 class ResNetWithTopologyPreprocess(nn.Module):
     def __init__(self, modelName, numClasses, inCh=3, imgSize=(32, 32), topologyDim=64, useGudhi: bool = False, maxPoints: int = 256):
         super().__init__()
         self.imgSize = imgSize
-        self.topologyLayer = TopologicalPreprocess(outputDim=topologyDim, useGudhi=useGudhi, maxPoints=maxPoints)
-
-        # ResNet will see original image + 1 topology channel
-        self.resnetInputChannels = inCh + 1
-
-        # Build base ResNet that accepts extra channel
-        self.resnet = buildResnet(
+        self.topologyLayer = TopologicalPreprocess(outputDim=topologyDim, useGudhi=useGudhi, maxPoints=maxPoints)        
+        self.resnetInputChannels = inCh + 1                                     #ResNet will see original image + 1 topology channel        
+        self.resnet = buildResnet(                                              #Build base ResNet that accepts extra channel
             modelName,
             numClasses=numClasses,
             inCh=self.resnetInputChannels,
             weights=None,
         )
-
-        # Modify first conv to match new input channels (defensive)
-        originalConv = self.resnet.conv1
+        
+        originalConv = self.resnet.conv1                                        #Modify first conv to match new input channels
         self.resnet.conv1 = nn.Conv2d(
             self.resnetInputChannels,
             originalConv.out_channels,
@@ -151,44 +154,40 @@ class ResNetWithTopologyPreprocess(nn.Module):
         )
 
     def buildTopologyChannel(self, x):
-        topologyFeatures = self.topologyLayer(x)  # (batch, topologyDim)
+        topologyFeatures = self.topologyLayer(x)                                #(batch, topologyDim)
         batchSize, _, h, w = x.shape
 
         topologyChannel = topologyFeatures.unsqueeze(-1).unsqueeze(-1)
         topologyChannel = topologyChannel.expand(-1, -1, h, w)
-        topologyInput = topologyChannel[:, 0:1, :, :]  # (batch, 1, H, W)
+        topologyInput = topologyChannel[:, 0:1, :, :]                           #(batch, 1, H, W)
         return topologyInput
 
-    def forward(self, x):
-        # 1) Pre-processing: persistence on raw image
-        topologyInput = self.buildTopologyChannel(x)
-
-        # 2) Concatenate as input to ResNet (pre-CNN)
-        resnetInput = torch.cat([x, topologyInput], dim=1)
-
-        # 3) Standard ResNet forward
-        return self.resnet(resnetInput)
+    def forward(self, x):        
+        topologyInput = self.buildTopologyChannel(x)                            #Step1: Pre-processing: persistence on raw image        
+        resnetInput = torch.cat([x, topologyInput], dim=1)                      #Step2: Concatenate as input to ResNet (pre-CNN)        
+        return self.resnet(resnetInput)                                         #Step3: Standard ResNet forward
 
 
+
+# -------------------------------------------------------------------------
+# VGG model extended with a topological preprocessing channel (PLLay-based).
+# Inputs: modelName, numClasses, inCh, imgSize, topologyDim, useGudhi, maxPoints
+# Output: class logits from VGG with integrated topological features
+# -------------------------------------------------------------------------
 class VggWithTopologyPreprocess(nn.Module):
     def __init__(self, modelName, numClasses, inCh=3, imgSize=(32, 32), topologyDim=64, useGudhi: bool = False, maxPoints: int = 256):
         super().__init__()
         self.imgSize = imgSize
-        self.topologyLayer = TopologicalPreprocess(outputDim=topologyDim, useGudhi=useGudhi, maxPoints=maxPoints)
-
-        # VGG will see original image + 1 topology channel
-        self.vggInputChannels = inCh + 1
-
-        # Build base VGG that accepts extra channel
-        self.vgg = buildVgg(
+        self.topologyLayer = TopologicalPreprocess(outputDim=topologyDim, useGudhi=useGudhi, maxPoints=maxPoints)      
+        self.vggInputChannels = inCh + 1                                        #VGG will see original image + 1 topology channel        
+        self.vgg = buildVgg(                                                    #Build base VGG that accepts extra channel    
             modelName,
             numClasses=numClasses,
             inCh=self.vggInputChannels,
             weights=None,
         )
-
-        # Modify first conv to accept topology channel (defensive)
-        originalConv = self.vgg.features[0]
+        
+        originalConv = self.vgg.features[0]                                     #Modify first conv to accept topology channel
         self.vgg.features[0] = nn.Conv2d(
             self.vggInputChannels,
             originalConv.out_channels,
@@ -199,26 +198,26 @@ class VggWithTopologyPreprocess(nn.Module):
         )
 
     def buildTopologyChannel(self, x):
-        topologyFeatures = self.topologyLayer(x)  # (batch, topologyDim)
+        topologyFeatures = self.topologyLayer(x)                                #(batch, topologyDim)
         batchSize, _, h, w = x.shape
 
         topologyChannel = topologyFeatures.unsqueeze(-1).unsqueeze(-1)
         topologyChannel = topologyChannel.expand(-1, -1, h, w)
-        topologyInput = topologyChannel[:, 0:1, :, :]  # (batch, 1, H, W)
+        topologyInput = topologyChannel[:, 0:1, :, :]                           #(batch, 1, H, W)
         return topologyInput
 
-    def forward(self, x):
-        # 1) Pre-processing: persistence on raw image
-        topologyInput = self.buildTopologyChannel(x)
-
-        # 2) Concatenate as input to VGG (pre-CNN)
-        vggInput = torch.cat([x, topologyInput], dim=1)
-
-        # 3) Standard VGG forward
-        return self.vgg(vggInput)
+    def forward(self, x):        
+        topologyInput = self.buildTopologyChannel(x)                            #Step1: Pre-processing: persistence on raw image        
+        vggInput = torch.cat([x, topologyInput], dim=1)                         #Step2: Concatenate as input to VGG (pre-CNN)        
+        return self.vgg(vggInput)                                               #Step3: Standard VGG forward
 
 
-# ===== Standard Models =====
+
+# -------------------------------------------------------------------------
+# Basic CNN architecture for image classification.
+# Inputs: inCh, numClasses, imgSize
+# Output: class logits from a two-layer convolutional network
+# -------------------------------------------------------------------------
 class SimpleCnn(nn.Module):
     def __init__(self, inCh, numClasses, imgSize=(28, 28)):
         super().__init__()
@@ -231,10 +230,7 @@ class SimpleCnn(nn.Module):
             nn.MaxPool2d(2),
         )
 
-        # Save image size
         self.imgSize = imgSize
-
-        # Calculate the flattened dimension dynamically for this imgSize
         self.flatten_dim = self._get_flatten_dim(inCh, imgSize)
 
         self.fcLayers = nn.Sequential(
@@ -246,7 +242,6 @@ class SimpleCnn(nn.Module):
         )
 
     def _get_flatten_dim(self, inCh, imgSize):
-        """Calculate the flattened dimension after conv layers"""
         with torch.no_grad():
             dummy_input = torch.zeros(1, inCh, imgSize[0], imgSize[1])
             dummy_output = self.convLayers(dummy_input)
@@ -257,6 +252,11 @@ class SimpleCnn(nn.Module):
         return self.fcLayers(x)
 
 
+# -------------------------------------------------------------------------
+# Build and configure a ResNet model (18/34/50) for custom input channels.
+# Inputs: modelName, numClasses, inCh, weights
+# Output: configured ResNet model ready for training or evaluation
+# -------------------------------------------------------------------------
 def buildResnet(modelName, numClasses, inCh=3, weights=None):
     if modelName == "resnet18":
         model = models.resnet18(weights=weights)
@@ -270,7 +270,7 @@ def buildResnet(modelName, numClasses, inCh=3, weights=None):
     inFeatures = model.fc.in_features
     model.fc = nn.Linear(inFeatures, numClasses)
     
-    if inCh != 3:  # Modify first conv for non-RGB inputs
+    if inCh != 3:                                                           #Modify first conv for non-RGB inputs
         originalConv = model.conv1
         model.conv1 = nn.Conv2d(
             inCh, 
@@ -284,6 +284,12 @@ def buildResnet(modelName, numClasses, inCh=3, weights=None):
     return model
 
 
+
+# -------------------------------------------------------------------------
+# Build and configure a VGG model (11/16/19) for custom input channels.
+# Inputs: modelName, numClasses, inCh, weights
+# Output: configured VGG model ready for training or evaluation
+# -------------------------------------------------------------------------
 def buildVgg(modelName, numClasses, inCh=3, weights=None):
     if modelName == "vgg11":
         model = models.vgg11(weights=weights)
@@ -297,7 +303,7 @@ def buildVgg(modelName, numClasses, inCh=3, weights=None):
     inFeatures = model.classifier[-1].in_features
     model.classifier[-1] = nn.Linear(inFeatures, numClasses)
     
-    if inCh != 3:  # Modify first conv for non-RGB inputs
+    if inCh != 3:                                                                   #Modify first conv for non-RGB inputs
         originalConv = model.features[0]
         model.features[0] = nn.Conv2d(
             inCh,
@@ -306,6 +312,5 @@ def buildVgg(modelName, numClasses, inCh=3, weights=None):
             stride=originalConv.stride,
             padding=originalConv.padding,
             bias=originalConv.bias is not None
-        )
-    
+        )    
     return model

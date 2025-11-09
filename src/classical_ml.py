@@ -1,16 +1,21 @@
-import argparse, os, json, time
-import numpy as np
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import PCA
-from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
 from skimage.feature import hog
+from sklearn.svm import SVC
 from tqdm import tqdm
 import torchvision.datasets as dsets
 import torchvision.transforms as T
 import matplotlib.pyplot as plt
+import argparse, os, json, time
+import numpy as np
 
+# -------------------------------------------------------------------------
+# Load and return train/test splits for the selected dataset.
+# Inputs: name ('mnist', 'fashion', 'cifar10'), max_samples (optional)
+# Output: Xtr, ytr, Xte, yte (NumPy arrays of images and labels)
+# -------------------------------------------------------------------------
 def load_dataset(name, max_samples=None):
     if name=="mnist":
         ds_train = dsets.MNIST("./data", train=True, download=True, transform=T.ToTensor())
@@ -31,19 +36,28 @@ def load_dataset(name, max_samples=None):
         Xtr, ytr = Xtr[:max_samples], ytr[:max_samples]
     return Xtr, ytr, Xte, yte
 
+
+# -------------------------------------------------------------------------
+# Compute Histogram of Oriented Gradients (HOG) features for images.
+# Inputs: images (array of shape [N, H, W] or [N, H, W, C])
+# Output: NumPy array of HOG feature vectors
+# -------------------------------------------------------------------------
 def feat_hog(images):
-    # Accepts (N, H, W) or (N, H, W, C)
     feats = []
     for img in tqdm(images, desc="HOG"):
-        if img.ndim==3 and img.shape[-1]==3:
-            # convert to grayscale simple average
-            img = img.mean(axis=-1)
+        if img.ndim==3 and img.shape[-1]==3:            
+            img = img.mean(axis=-1)                                                                         # convert to grayscale simple average
         f = hog(img, orientations=9, pixels_per_cell=(8,8), cells_per_block=(2,2), feature_vector=True)
         feats.append(f)
     return np.array(feats)
 
+
+# -------------------------------------------------------------------------
+# Extract PCA-based features by flattening and reducing image dimensions.
+# Inputs: images (array [N, H, W, C] or [N, H, W]), n_components (default: 100)
+# Output: NumPy array of PCA-transformed features
+# -------------------------------------------------------------------------
 def feat_pca(images, n_components=100):
-    # Flatten then PCA -> 100 dims
     N = images.shape[0]
     flat = images.reshape(N, -1).astype(np.float32)/255.0
     scaler = StandardScaler(with_mean=True, with_std=True)
@@ -51,6 +65,13 @@ def feat_pca(images, n_components=100):
     p = PCA(n_components=n_components, random_state=42)
     return p.fit_transform(flat)
 
+
+# -------------------------------------------------------------------------
+# Execute a classical ML experiment with HOG/PCA features and SVM/RF classifier.
+# Inputs: dataset ('mnist', 'fashion', 'cifar10'), feature ('hog' or 'pca'),
+#         clf ('svm' or 'rf'), max_samples, out_dir (default: 'outputs')
+# Output: metrics JSON and confusion matrix plot (.png)
+# -------------------------------------------------------------------------
 def run(dataset, feature, clf, max_samples, out_dir="outputs"):
     Xtr, ytr, Xte, yte = load_dataset(dataset, max_samples=max_samples)
     if feature=="hog":
@@ -91,6 +112,11 @@ def run(dataset, feature, clf, max_samples, out_dir="outputs"):
         json.dump(metrics, f, indent=2)
     print(metrics)
 
+# -------------------------------------------------------------------------
+# Entry point: parse command-line arguments and run the selected experiment.
+# Inputs (CLI): --dataset, --feature, --clf, --max-samples
+# Action: calls run() with provided parameters
+# -------------------------------------------------------------------------
 if __name__=="__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True, choices=["mnist","fashion","cifar10"])

@@ -1,14 +1,16 @@
-from typing import Tuple, Callable, Optional
-import torch
 from torch.utils.data import DataLoader, random_split
+from typing import Tuple, Callable, Optional
 import torchvision.transforms as T
 import torchvision.datasets as dsets
+import torch
 
 
+# -------------------------------------------------------------------------
+# Return channel-wise mean and standard deviation for dataset normalization.
+# Inputs: datasetName ('mnist', 'fashion', 'cifar10', 'cifar100')
+# Output: tuples (mean, std) for each image channel
+# -------------------------------------------------------------------------
 def meanStd(datasetName: str) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
-    """
-    Returns channel-wise (mean, std) for normalization.
-    """
     if datasetName in ["mnist", "fashion"]:
         return (0.1307,), (0.3081,)
     elif datasetName in ["cifar10", "cifar100"]:
@@ -17,10 +19,12 @@ def meanStd(datasetName: str) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
         raise ValueError(f"Unknown dataset '{datasetName}'")
 
 
+# -------------------------------------------------------------------------
+# Build data augmentation and normalization transforms for the dataset.
+# Inputs: datasetName ('mnist', 'fashion', 'cifar10', 'cifar100'), isTrain (bool)
+# Output: torchvision transform pipeline (T.Compose)
+# -------------------------------------------------------------------------
 def buildTransforms(datasetName: str, isTrain: bool) -> T.Compose:
-    """
-    Builds torchvision transforms for a dataset.
-    """
     mean, std = meanStd(datasetName)
 
     if datasetName in ["mnist", "fashion"]:
@@ -41,10 +45,12 @@ def buildTransforms(datasetName: str, isTrain: bool) -> T.Compose:
         raise ValueError(f"Unknown dataset '{datasetName}'")
 
 
+# -------------------------------------------------------------------------
+# Load the specified torchvision dataset with proper transforms applied.
+# Inputs: datasetName ('mnist', 'fashion', 'cifar10'), isTrain (bool), root (data path)
+# Output: torchvision dataset object
+# -------------------------------------------------------------------------
 def loadDataset(datasetName: str, isTrain: bool, root: str = "./data"):
-    """
-    Loads a torchvision dataset with the appropriate transforms.
-    """
     if datasetName == "mnist":
         return dsets.MNIST(root, train=isTrain, download=True, transform=buildTransforms("mnist", isTrain))
     if datasetName == "fashion":
@@ -54,20 +60,14 @@ def loadDataset(datasetName: str, isTrain: bool, root: str = "./data"):
     raise ValueError("Dataset not supported. Use one of: mnist, fashion, cifar10.")
 
 
-def makeLoaders(
-    datasetName: str,
-    batchSize: int = 128,
-    valSplit: float = 0.1,
-    numWorkers: int = 2,
-    seed: int = 42,
-    args=None
-):
-    """
-    Creates train/val/test DataLoaders and returns basic dataset metadata.
-    """
-    # Load full training split
+# -------------------------------------------------------------------------
+# Create train, validation, and test DataLoaders with optional Gudhi subset.
+# Inputs: datasetName, batchSize, valSplit, numWorkers, seed, args (optional)
+# Output: trainLoader, valLoader, testLoader, inCh, numClasses, imgSize
+# -------------------------------------------------------------------------
+def makeLoaders(datasetName: str, batchSize: int = 128, valSplit: float = 0.1, numWorkers: int = 2, seed: int = 42, args=None):
+
     fullTrain = loadDataset(datasetName, isTrain=True)
-    # Load official test split
     testSet = loadDataset(datasetName, isTrain=False)
 
     if args is not None and getattr(args, "useGudhi", False):
@@ -75,52 +75,31 @@ def makeLoaders(
         subsetSize = min(subsetSize, len(fullTrain))
         fullTrain = torch.utils.data.Subset(fullTrain, range(subsetSize))
 
-    # Derive validation length
     valLen = int(len(fullTrain) * valSplit)
     trainLen = len(fullTrain) - valLen
 
-    # Reproducible split using a fixed seed
     generator = torch.Generator().manual_seed(seed)
     trainSet, valSet = random_split(fullTrain, [trainLen, valLen], generator=generator)
 
-    # Only use pin_memory if CUDA is available (FIXED)
     pin_memory = torch.cuda.is_available()
     
-    # DataLoaders with conditional pin_memory
-    trainLoader = DataLoader(
-        trainSet, 
-        batch_size=batchSize, 
-        shuffle=True, 
-        num_workers=numWorkers, 
-        pin_memory=pin_memory
-    )
-    valLoader = DataLoader(
-        valSet,   
-        batch_size=batchSize, 
-        shuffle=False, 
-        num_workers=numWorkers, 
-        pin_memory=pin_memory
-    )
-    testLoader = DataLoader(
-        testSet,  
-        batch_size=batchSize, 
-        shuffle=False, 
-        num_workers=numWorkers, 
-        pin_memory=pin_memory
-    )
+    trainLoader = DataLoader(trainSet, batch_size=batchSize, shuffle=True, num_workers=numWorkers, pin_memory=pin_memory)
+    valLoader   = DataLoader(valSet,   batch_size=batchSize, shuffle=False, num_workers=numWorkers, pin_memory=pin_memory)
+    testLoader  = DataLoader(testSet,  batch_size=batchSize, shuffle=False, num_workers=numWorkers, pin_memory=pin_memory)
 
-    # Infer input channels and image size from dataset type
     inCh = 1 if datasetName in ["mnist", "fashion"] else 3
-    numClasses = 10  # fixed for MNIST/Fashion/CIFAR-10
+    numClasses = 10                                                             #fixed for MNIST/Fashion/CIFAR-10
     imgSize = (32, 32)
 
     return trainLoader, valLoader, testLoader, inCh, numClasses, imgSize
 
 
+# -------------------------------------------------------------------------
+# Apply Gaussian noise to input tensor during evaluation (optional).
+# Inputs: x (tensor), noiseType ('none' or 'gaussian'), sigma (noise std)
+# Output: noisy tensor (or original if noise disabled)
+# -------------------------------------------------------------------------
 def applyEvalNoise(x: torch.Tensor, noiseType: str = "none", sigma: float = 0.0) -> torch.Tensor:
-    """
-    Optionally corrupts a batch of inputs with noise during evaluation.
-    """
     if noiseType == "none" or sigma <= 0.0:
         return x
 

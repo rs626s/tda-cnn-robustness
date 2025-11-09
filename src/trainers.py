@@ -1,11 +1,16 @@
-import torch
-import torch.nn as nn
-from tqdm import tqdm
 from utils import accuracyFromLogits
+from tqdm import tqdm
+import torch.nn as nn
+import torch
 
 
+
+# -------------------------------------------------------------------------
+# Train the model for a single epoch.
+# Inputs: model (nn.Module), loader (DataLoader), optimizer, device (CPU/GPU)
+# Output: dict with average training loss and accuracy for the epoch
+# -------------------------------------------------------------------------
 def trainOneEpoch(model, loader, optimizer, device):
-    """Trains the model for exactly one epoch"""
     model.train()
     lossFn = nn.CrossEntropyLoss()
 
@@ -34,16 +39,19 @@ def trainOneEpoch(model, loader, optimizer, device):
     }
 
 
+# -------------------------------------------------------------------------
+# Evaluate model performance on a dataset (no gradient updates).
+# Inputs: model (nn.Module), loader (DataLoader), device (CPU/GPU),
+#         noiseFn (optional noise function), maxBatches (optional limit)
+# Output: dict with average loss, accuracy, predictions, and true labels
+# -------------------------------------------------------------------------
 @torch.no_grad()
 def evaluateModel(model, loader, device, noiseFn=None, maxBatches=None):
-    """Evaluates the model without gradient tracking"""
     model.eval()
     lossFn = nn.CrossEntropyLoss()
 
     totalLoss, totalAcc, nSamples = 0.0, 0.0, 0
     allPreds, allTargets = [], []
-
-    # If maxBatches is given, tell tqdm the smaller total
     total_batches = maxBatches if maxBatches is not None else None
 
     for batch_idx, (inputs, targets) in enumerate(tqdm(loader, desc="eval", leave=False, total=total_batches)):

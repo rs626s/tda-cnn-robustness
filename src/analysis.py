@@ -1,17 +1,20 @@
-import torch
-import torch.nn as nn
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from typing import Dict, List
+import matplotlib.pyplot as plt
+import torch.nn as nn
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import torch
 import json
 import os
 
 
-# ===== Robustness Analysis =====
+# -------------------------------------------------------------------------
+# Tests model accuracy under different Gaussian noise levels.
+# Inputs: model, testLoader, device, noiseLevels, maxBatches (optional)
+# Output: dict {noise_sigma: accuracy}
+# -------------------------------------------------------------------------
 def testNoiseRobustness(model, testLoader, device, noiseLevels=[0.0, 0.1, 0.2, 0.3], maxBatches=None):
-    """Test model robustness against Gaussian noise"""
     results = {}
     model.eval()
     
@@ -42,8 +45,12 @@ def testNoiseRobustness(model, testLoader, device, noiseLevels=[0.0, 0.1, 0.2, 0
     return results
 
 
+# -------------------------------------------------------------------------
+# Plot robustness curves for different noise levels
+# Inputs: robustnessResults, savePath, modelName, datasetName
+# Output: saved robustness plot (.png)
+# -------------------------------------------------------------------------
 def plotRobustnessCurves(robustnessResults, savePath, modelName, datasetName):
-    """Plot robustness curves for different noise levels"""
     sigmas = [k for k in robustnessResults.keys() if k.startswith('noise_sigma_')]
     accuracies = [robustnessResults[s] for s in sigmas]
     sigmaValues = [float(s.split('_')[-1]) for s in sigmas]
@@ -61,9 +68,12 @@ def plotRobustnessCurves(robustnessResults, savePath, modelName, datasetName):
     plt.close()
 
 
-# ===== Topological Features Analysis =====
+# -------------------------------------------------------------------------
+# Extract and visualize topological features from the PLLay layer.
+# Inputs: model, testLoader, device, savePath, maxBatches (optional)
+# Output: scatter plot of topological feature space (.png)
+# -------------------------------------------------------------------------
 def analyzeTopologicalFeatures(model, testLoader, device, savePath, maxBatches=None):
-    """Analyze real topological features from PLLay"""
     model.eval()
     topologyFeatures = []
     labels = []
@@ -100,11 +110,13 @@ def analyzeTopologicalFeatures(model, testLoader, device, savePath, maxBatches=N
         print("No topological features found in model")
 
 
-# ===== Comparative Analysis =====
+# -------------------------------------------------------------------------
+# Collect and aggregate metrics from all experiment folders.
+# Inputs: resultsDir (default: "outputs")
+# Output: pandas DataFrame containing all run metrics
+# -------------------------------------------------------------------------
 def collectResults(resultsDir: str = "outputs"):
-    """Collect results from all experiments"""
-    allResults = []
-    
+    allResults = []    
     for runDir in os.listdir(resultsDir):
         metricsPath = os.path.join(resultsDir, runDir, "metrics.json")
         if os.path.exists(metricsPath):
@@ -116,8 +128,12 @@ def collectResults(resultsDir: str = "outputs"):
     return pd.DataFrame(allResults)
 
 
+# -------------------------------------------------------------------------
+# Generate comparison plots of model accuracy across datasets.
+# Inputs: df (results DataFrame), outputDir (path to save plots)
+# Output: bar plot of model performance (.png)
+# -------------------------------------------------------------------------
 def createComparisonPlots(df: pd.DataFrame, outputDir: str):
-    """Create comparison plots across models and datasets"""
     if len(df) == 0:
         print("No results to plot")
         return
